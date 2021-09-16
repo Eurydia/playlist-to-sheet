@@ -9,6 +9,7 @@ from gspread import client, authorize, models
 from oauth2client.service_account import ServiceAccountCredentials
 
 from video import Video
+from keep_alive import keep_alive
 
 def get_youtube_client() -> Resource:
     name = 'youtube'
@@ -72,6 +73,7 @@ def filter_video(
         video_id  = video_data['snippet']['resourceId']['videoId']
 
         if video_id in seen:
+            print(f'{video_id} is a duplicate. Skipping.')
             continue
 
         seen.add(video_id)
@@ -87,6 +89,7 @@ def filter_video(
                         ).execute()
 
         if not more_data['items']:
+            print(f'{video_id} is removed. Skipping.')
             continue
 
         more_snippet = more_data['items'][0]['snippet']
@@ -111,7 +114,7 @@ def filter_video(
 
         filtered.append(new_video)
         
-    print("Filering finished for token.")
+    print("Filtering finished for token.")
     return filtered
 
 def get_videos(
@@ -164,6 +167,7 @@ def task():
 
 def main():
     print('Running')
+    keep_alive()
     task()
 
 if __name__ == '__main__':
